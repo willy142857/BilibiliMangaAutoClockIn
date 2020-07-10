@@ -36,18 +36,22 @@ namespace BilibiliMangaAutoClockIn.Model
 					var baseTime = Timestamp.GetTime(tsProperty.GetRawText());
 					if (root.TryGetProperty(@"data", out var data))
 					{
-						if (data.TryGetProperty(@"mid", out var mid) && mid.TryGetInt64(out Uid)
-						&& data.TryGetProperty(@"access_token", out var accessToken)
-						&& data.TryGetProperty(@"expires_in", out var expiresInProperty)
-						&& expiresInProperty.TryGetInt64(out var expiresIn))
+						if (data.TryGetProperty(@"token_info", out var tokenInfo))
 						{
-							AccessToken = accessToken.GetString();
-							Expires = baseTime + TimeSpan.FromSeconds(expiresIn);
+							if (tokenInfo.TryGetProperty(@"mid", out var mid) && mid.TryGetInt64(out Uid)
+							                        && tokenInfo.TryGetProperty(@"access_token", out var accessToken)
+							                        && tokenInfo.TryGetProperty(@"expires_in", out var expiresInProperty)
+							                        && expiresInProperty.TryGetInt64(out var expiresIn))
+							{
+								AccessToken = accessToken.GetString();
+								Expires = baseTime + TimeSpan.FromSeconds(expiresIn);
+							}
+							if (tokenInfo.TryGetProperty(@"refresh_token", out var refreshToken))
+							{
+								RefreshToken = refreshToken.GetString();
+							}
 						}
-						if (data.TryGetProperty(@"refresh_token", out var refreshToken))
-						{
-							RefreshToken = refreshToken.GetString();
-						}
+						
 					}
 				}
 			}
